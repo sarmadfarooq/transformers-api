@@ -76,6 +76,7 @@ public class GamesController {
 
     @ApiOperation(value = "Operation to update an existing transformer")
     @ApiResponses(value = {
+            @ApiResponse(code = 400, message = "Unable to update transformer id"),
             @ApiResponse(code = 404, message = "Unable to update given transformer"),
             @ApiResponse(code = 500, message = "Server Error")}
     )
@@ -83,8 +84,24 @@ public class GamesController {
             value = "/transformer/{id}")
     public ResponseEntity<String> updateTransformer(@RequestBody Transformer transformer,
                                                     @PathVariable("id") int id) {
-        log.info("Updating Transformer id: {}", id);
-        return ResponseEntity.ok("SUCCESS");
+        try {
+            if (id != transformer.getId()) {
+                log.error("Transformer id cannot be updated");
+                return ResponseEntity.badRequest().body("Unable to update transformer id");
+            }
+            boolean success = transformerService.updateTransformer(transformer);
+            if (success) {
+                log.info("Updated Transformer id: {}", id);
+                return ResponseEntity.ok("SUCCESS");
+            } else {
+                log.error("Transformer id cannot be updated, possible not found");
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            log.error("An error occurred while processing update request. {}", e);
+            return ResponseEntity.status(INTERNAL_SERVER_ERROR).build();
+
+        }
     }
 
     @ApiOperation(value = "Operation to delete an existing transformer")
@@ -97,8 +114,19 @@ public class GamesController {
             value = "/transformer/{id}")
     public ResponseEntity<String> deleteTransformer(@PathVariable("id") int id) {
         log.info("Deleting Transformer id: {}", id);
-
-        return ResponseEntity.ok("SUCCESS");
+        try {
+            boolean success = transformerService.deleteTransformer(id);
+            if (success) {
+                log.info("Deleted Transformer id: {}", id);
+                return ResponseEntity.ok("SUCCESS");
+            } else {
+                log.error("Transformer id cannot be deleted, possible not found");
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            log.error("An error occurred while processing delete request. {}", e);
+            return ResponseEntity.status(INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @ApiOperation(value = "Operation to initiate a fight between list of transformers.")
@@ -125,7 +153,7 @@ public class GamesController {
             log.info("All transformers destroyed, sending empty response back");
             return ResponseEntity.ok(BattleResponse.builder().build());
         } catch (Exception e) {
-            log.info("Internal error: {}",e);
+            log.info("Internal error: {}", e);
             return ResponseEntity.status(INTERNAL_SERVER_ERROR).build();
         }
     }

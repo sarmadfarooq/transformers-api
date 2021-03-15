@@ -15,7 +15,6 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Collections;
@@ -24,7 +23,7 @@ import java.util.Optional;
 
 import static games.transformers.transformersapi.domain.Transformer.Type.A;
 import static games.transformers.transformersapi.domain.Transformer.Type.D;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -92,19 +91,33 @@ class GamesControllerTest {
     @Test
     void shouldUpdateTransformer() {
         //assemble
+        Transformer test = TransformerTest.buildTransformer("Test", A);
+        test.setId(1);
         when(transformerServiceMock.updateTransformer(any())).thenReturn(true);
         //act
-        ResponseEntity<String> responseEntity = gamesController.updateTransformer(TransformerTest.buildTransformer("Test", A),1);
+        ResponseEntity<String> responseEntity = gamesController.updateTransformer(test,1);
         //assert
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
     }
 
     @Test
+    void shouldNotUpdateTransformerThatDoesNoHaveMatchingID() {
+        //assemble
+        Transformer test = TransformerTest.buildTransformer("Test", A);
+        test.setId(1);
+        //act
+        ResponseEntity<String> responseEntity = gamesController.updateTransformer(test,12);
+        //assert
+        assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
+    }
+    @Test
     void shouldNotUpdateTransformerThatDoesNotExist() {
         //assemble
+        Transformer test = TransformerTest.buildTransformer("Test", A);
+        test.setId(1);
         when(transformerServiceMock.updateTransformer(any())).thenReturn(false);
         //act
-        ResponseEntity<String> responseEntity = gamesController.updateTransformer(TransformerTest.buildTransformer("Test", A),1);
+        ResponseEntity<String> responseEntity = gamesController.updateTransformer(test,1);
         //assert
         assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
     }
@@ -112,9 +125,11 @@ class GamesControllerTest {
     @Test
     void shouldFailToUpdateTransformer() {
         //assemble
+        Transformer test = TransformerTest.buildTransformer("Test", A);
+        test.setId(1);
         when(transformerServiceMock.updateTransformer(any())).thenThrow(NullPointerException.class);
         //act
-        ResponseEntity<String> responseEntity = gamesController.updateTransformer(TransformerTest.buildTransformer("Test", A),1);
+        ResponseEntity<String> responseEntity = gamesController.updateTransformer(test,1);
         //assert
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
     }
@@ -122,7 +137,7 @@ class GamesControllerTest {
     @Test
     void shouldDeleteTransformer() {
         //assemble
-        when(transformerServiceMock.deleteTransformer(any())).thenReturn(true);
+        when(transformerServiceMock.deleteTransformer(1)).thenReturn(true);
         //act
         ResponseEntity<String> responseEntity = gamesController.deleteTransformer(1);
         //assert
@@ -132,7 +147,7 @@ class GamesControllerTest {
     @Test
     void shouldNotDeleteTransformerThatDoesNotExist() {
         //assemble
-        when(transformerServiceMock.deleteTransformer(any())).thenReturn(false);
+        when(transformerServiceMock.deleteTransformer(1)).thenReturn(false);
         //act
         ResponseEntity<String> responseEntity = gamesController.deleteTransformer(1);
         //assert
@@ -142,7 +157,7 @@ class GamesControllerTest {
     @Test
     void shouldFailToDeleteTransformer() {
         //assemble
-        when(transformerServiceMock.deleteTransformer(any())).thenThrow(NullPointerException.class);
+        when(transformerServiceMock.deleteTransformer(1)).thenThrow(NullPointerException.class);
         //act
         ResponseEntity<String> responseEntity = gamesController.deleteTransformer(1);
         //assert
