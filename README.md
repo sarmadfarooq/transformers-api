@@ -83,8 +83,10 @@ http://localhost:8080/game/fight
 
 #####CURL 
 `curl -X POST "http://localhost:8080/game/fight" -H "accept: */*" -H "Content-Type: application/json" -d "[ 8,6]"`
+
 #####Fight Response
 Fight details are sent back in JSON format.  
+
 #####Example JSON fight response 
 `{
   "battleCount": 1,
