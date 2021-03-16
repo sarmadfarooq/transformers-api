@@ -1,14 +1,12 @@
 package games.transformers.transformersapi.dao;
 
 import games.transformers.transformersapi.domain.Transformer;
-import org.omg.PortableInterceptor.INACTIVE;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 /**
@@ -91,7 +89,7 @@ public class TransformerDAOImpl implements TransformerDAO {
      * @return true if successfully deleted
      */
     @Override
-    public boolean deleteTransformer(long id) {
+    public boolean deleteTransformer(int id) {
         boolean success = false;
         if (transformerMap.get(id) != null) {
             transformerMap.remove(id);

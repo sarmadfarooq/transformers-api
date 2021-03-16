@@ -1,6 +1,6 @@
 package games.transformers.transformersapi.web;
 
-import games.transformers.transformersapi.domain.BattleResponse;
+import games.transformers.transformersapi.domain.FightResponse;
 import games.transformers.transformersapi.domain.Transformer;
 import games.transformers.transformersapi.domain.TransformerTest;
 import games.transformers.transformersapi.service.BattleService;
@@ -169,9 +169,9 @@ class GamesControllerTest {
         //assemble
         when(transformerServiceMock.getTransformer(1)).thenReturn(Optional.of(TransformerTest.buildTransformer("Auto",A)));
         when(transformerServiceMock.getTransformer(2)).thenReturn(Optional.of(TransformerTest.buildTransformer("Dec",D)));
-        when(battleServiceMock.fight(any())).thenReturn(BattleResponse.builder().battleCount(1).build());
+        when(battleServiceMock.fight(any())).thenReturn(FightResponse.builder().battleCount(1).build());
         //act
-        ResponseEntity<BattleResponse> responseEntity = gamesController.beginFight(Arrays.asList(1,2));
+        ResponseEntity<FightResponse> responseEntity = gamesController.beginFight(Arrays.asList(1,2));
         //assert
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         assertEquals(1, responseEntity.getBody().getBattleCount());
@@ -184,7 +184,7 @@ class GamesControllerTest {
         when(transformerServiceMock.getTransformer(2)).thenReturn(Optional.of(TransformerTest.buildTransformer("Dec",D)));
         when(battleServiceMock.fight(any())).thenThrow(EndOfGameException.class);
         //act
-        ResponseEntity<BattleResponse> responseEntity = gamesController.beginFight(Arrays.asList(1,2));
+        ResponseEntity<FightResponse> responseEntity = gamesController.beginFight(Arrays.asList(1,2));
         //assert
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         assertEquals(0, responseEntity.getBody().getBattleCount());
@@ -200,7 +200,7 @@ class GamesControllerTest {
         when(transformerServiceMock.getTransformer(2)).thenReturn(Optional.of(TransformerTest.buildTransformer("Dec",D)));
         when(battleServiceMock.fight(any())).thenThrow(NullPointerException.class);
         //act
-        ResponseEntity<BattleResponse> responseEntity = gamesController.beginFight(Arrays.asList(1,2));
+        ResponseEntity<FightResponse> responseEntity = gamesController.beginFight(Arrays.asList(1,2));
         //assert
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
     }

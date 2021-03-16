@@ -78,7 +78,7 @@ public class TransformerServiceImpl implements TransformerService {
      * @return true if successfully deleted
      */
     @Override
-    public boolean deleteTransformer(long id) {
+    public boolean deleteTransformer(int id) {
         return transformerDAO.deleteTransformer(id);
     }
 }

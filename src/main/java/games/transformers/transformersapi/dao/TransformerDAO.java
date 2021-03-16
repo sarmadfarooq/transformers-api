@@ -39,5 +39,5 @@ public interface TransformerDAO {
      * @param id
      * @return  true if successfully deleted
      */
-    boolean deleteTransformer(long id);
+    boolean deleteTransformer(int id);
 }

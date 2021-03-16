@@ -7,7 +7,7 @@ import java.util.List;
 
 @Data
 @Builder
-public class BattleResponse {
+public class FightResponse {
     int battleCount;
     Transformer.Type winningTeam;
     List<String> winners;

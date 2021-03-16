@@ -1,6 +1,6 @@
 package games.transformers.transformersapi.web;
 
-import games.transformers.transformersapi.domain.BattleResponse;
+import games.transformers.transformersapi.domain.FightResponse;
 import games.transformers.transformersapi.domain.Transformer;
 import games.transformers.transformersapi.service.BattleService;
 import games.transformers.transformersapi.service.EndOfGameException;
@@ -136,7 +136,7 @@ public class GamesController {
     )
     @PostMapping(
             value = "/fight")
-    public ResponseEntity<BattleResponse> beginFight(@RequestBody List<Integer> transformerIDs) {
+    public ResponseEntity<FightResponse> beginFight(@RequestBody List<Integer> transformerIDs) {
         log.info("Initiating fight ");
 
         // Skipping validation for now. Will not fail even if invalid id is passed in the input
@@ -146,12 +146,12 @@ public class GamesController {
                 .map(Optional::get)
                 .collect(Collectors.toList());
         try {
-            BattleResponse fight = battleService.fight(transformers);
+            FightResponse fight = battleService.fight(transformers);
             return ResponseEntity.ok(fight);
 
         } catch (EndOfGameException e) {
             log.info("All transformers destroyed, sending empty response back");
-            return ResponseEntity.ok(BattleResponse.builder().build());
+            return ResponseEntity.ok(FightResponse.builder().build());
         } catch (Exception e) {
             log.info("Internal error: {}", e);
             return ResponseEntity.status(INTERNAL_SERVER_ERROR).build();

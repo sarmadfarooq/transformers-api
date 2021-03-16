@@ -1,6 +1,6 @@
 package games.transformers.transformersapi.service;
 
-import games.transformers.transformersapi.domain.BattleResponse;
+import games.transformers.transformersapi.domain.FightResponse;
 import games.transformers.transformersapi.domain.Transformer;
 import games.transformers.transformersapi.domain.Transformer.Type;
 import org.springframework.stereotype.Service;
@@ -11,12 +11,23 @@ import java.util.stream.Stream;
 
 import static java.lang.Math.min;
 
+/**
+ * This service implements the specific rules defined in the exercise question.
+ * Assumptions: Autobots are declared as winning team if the both teams win equal number
+ * of fights.
+ */
 @Service
 public class BattleServiceImpl implements BattleService {
     public static final Set<String> SPECIAL_TRANSFORMERS = Stream.of("Optimus Prime", "Predaking").collect(Collectors.toCollection(HashSet::new));
 
+    /**
+     * Starts a fight between given list of Transformers
+     * @param transformers List of Transformers
+     * @return Details of the fight
+     * @throws EndOfGameException
+     */
     @Override
-    public BattleResponse fight(List<Transformer> transformers) throws EndOfGameException {
+    public FightResponse fight(List<Transformer> transformers) throws EndOfGameException {
         //sorting by rank, lower ranks fight first
         List<Transformer> autobots = transformers.stream()
                 .filter(transformer -> transformer.getType() == Transformer.Type.A)
@@ -38,13 +49,12 @@ public class BattleServiceImpl implements BattleService {
                 decepticonWinners.add(decepticons.get(i));
             }
         }
-        BattleResponse battleResponse = prepareWinnerAndSurvivers(autobots, decepticons, autobotWinners, decepticonWinners, maxBattles);
+        FightResponse fightResponse = prepareWinnerAndSurvivers(autobots, decepticons, autobotWinners, decepticonWinners, maxBattles);
 
-        return battleResponse;
+        return fightResponse;
     }
 
     private Type fight(Transformer transformer1, Transformer transformer2) throws EndOfGameException {
-
         //check for special cases
         if (SPECIAL_TRANSFORMERS.contains(transformer1.getName()) && SPECIAL_TRANSFORMERS.contains(transformer2.getName())) {
             throw new EndOfGameException("Game End");
@@ -81,9 +91,9 @@ public class BattleServiceImpl implements BattleService {
         return null;
     }
 
-    private BattleResponse prepareWinnerAndSurvivers(List<Transformer> autobots, List<Transformer> decepticons,
-                                                     List<Transformer> autobotWinners, List<Transformer> decepticonWinners,
-                                                     int maxBattles) {
+    private FightResponse prepareWinnerAndSurvivers(List<Transformer> autobots, List<Transformer> decepticons,
+                                                    List<Transformer> autobotWinners, List<Transformer> decepticonWinners,
+                                                    int maxBattles) {
         List<String> winnerNames;
         List<String> survivorNames;
         List<Transformer> neverFought = new LinkedList<>();
@@ -105,7 +115,7 @@ public class BattleServiceImpl implements BattleService {
             appendWinnersOrSurvivers(winnerNames, thoseWhoNeverFoughtType, namesOfThoseWhoNeverFought, survivorNames, Type.A);
             winningTeam = Type.A;
         }
-        return BattleResponse.builder().battleCount(maxBattles).winningTeam(winningTeam).winners(winnerNames).survivors(survivorNames).build();
+        return FightResponse.builder().battleCount(maxBattles).winningTeam(winningTeam).winners(winnerNames).survivors(survivorNames).build();
     }
 
     private void appendWinnersOrSurvivers(List<String> winnerNames, Type thoseWhoNeverFoughtType, List<String> namesOfThoseWhoNeverFought, List<String> survivorNames, Type winnerType) {
@@ -118,7 +128,7 @@ public class BattleServiceImpl implements BattleService {
 
     private Type getThoseWhoNeverFought(List<Transformer> autobots, List<Transformer> decepticons, int maxBattles, List<Transformer> neverFought) {
         if (autobots.size() > decepticons.size()) {
-            neverFought.addAll(autobots.subList(maxBattles, autobots.size() ));
+            neverFought.addAll(autobots.subList(maxBattles, autobots.size()));
             return Type.A;
         } else {
             neverFought.addAll(decepticons.subList(maxBattles, decepticons.size()));
